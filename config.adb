@@ -298,49 +298,61 @@ package body Config is
       Line_End          : Natural    := 0;
       Line_Count        : Natural    := 0;
       use Ada.Text_IO;
-      File_1, File_2    : File_Type;
+      File              : File_Type;
       use Ada.Strings.Fixed;
+      --
+      type Ini_Line;
+      type Ini_Line_Ptr is access Ini_Line;
+      type Ini_Line is record
+        next: Ini_Line_Ptr:= null;
+        line: Str_Ptr;
+      end record;
+      procedure Free is new Ada.Unchecked_Deallocation(Ini_Line, Ini_Line_Ptr);
+      --
+      root, curr, new_ini_line, to_free: Ini_Line_Ptr:= null;
    begin
       Get_Value(Cfg, Section, Mark, Line, Value_Start, Value_End, Found_Line);
       if Found_Line = 0 then
          raise Location_Not_found;
       end if;
-      Open(File_1, In_File, Cfg.Config_File.all);
-      Create(File_2, Out_File, ""); -- temp file
+      Open(File, In_File, Cfg.Config_File.all);
       Read_File:
-      while not End_Of_File(File_1) loop
-         Get_Line(File_1, Line, Line_End);
+      while not End_Of_File(File) loop
+         Get_Line(File, Line, Line_End);
          Line_Count:= Line_Count + 1;
+         --
+         new_ini_line:= new Ini_Line;
+         if root = null then
+           root:= new_ini_line;
+         else
+           curr.next:= new_ini_line;
+         end if;
+         curr:= new_ini_line;
+         --
          if Line_Count = Found_Line then -- Change this line
             Equal_Ind := Index(Source  => Line(Line'First .. Line_End),
                                Pattern => "=");
             if Equal_Ind < Line'First then -- No '=' yet, will change...
-              Put(File_2, Line(Line'First .. Line_End) & '=');
+              curr.line:= new String'(Line(Line'First .. Line_End) & '=' & New_Value);
             else
-              Put(File_2, Line(Line'First .. Equal_Ind));
+              curr.line:= new String'(Line(Line'First .. Equal_Ind) & New_Value);
             end if;
-            Put_Line(File_2, New_Value);
          else -- any other line: just copy
-            Put_Line(File_2, Line(Line'First .. Line_End));
+            curr.line:= new String'(Line(Line'First .. Line_End));
          end if;
       end loop Read_File;
-      Close(File_1);
-      -- To stick with pure Ada 95, there is no "rename", so
-      -- we need to do copy & delete !
-      declare
-         Temp_name: constant String:= Name(File_2);
-      begin
-         Close(File_2);
-         Open(File_1, In_File, Temp_name);
-      end;
-      Create(File_2, Out_File, Cfg.Config_File.all);
-      Read_File_Again:
-      while not End_Of_File(File_1) loop
-         Get_Line(File_1, Line, Line_End);
-         Put_Line(File_2, Line(Line'First .. Line_End));
-      end loop Read_File_Again;
-      Delete(File_1);
-      Close(File_2);
+      Close(File);
+      -- Now, write the new file
+      Create(File, Out_File, Cfg.Config_File.all);
+      curr:= root;
+      while curr /= null loop
+         Put_Line(File, curr.line.all);
+         to_free:= curr;
+         curr:= curr.next;
+         Free(to_free.line);
+         Free(to_free);
+      end loop;
+      Close(File);
    end Replace_Value;
 
 end Config;

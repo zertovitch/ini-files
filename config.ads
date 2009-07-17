@@ -29,6 +29,7 @@
 
 -- Change log
 --
+-- 17-Jul-2009:  GdM: - Improved Replace_Value
 -- 15-Jul-2009:  GdM: - Added type Configuration to wrap name and options
 --                    - Added Replace_Value
 --                    - A few fixes
@@ -106,14 +107,14 @@ package Config is
    function File_Name(Cfg: Configuration) return String;
 
    -- Replace a single value in a configuration file.
-   -- Two whole files are written, so it's rather a solution for
-   -- making changing sporadic changes.
+   -- The whole .ini file is rewritten each time, so it's rather a
+   -- solution for making sporadic changes.
    -- For changing many values, it might be better to rewrite
    -- the whole file in one go.
    --
-   procedure Replace_Value(Cfg     : in Configuration;
-                           Section : in String;
-                           Mark    : in String;
+   procedure Replace_Value(Cfg      : in Configuration;
+                           Section  : in String;
+                           Mark     : in String;
                            New_Value: in String);
 
    Location_Not_Found: exception;
