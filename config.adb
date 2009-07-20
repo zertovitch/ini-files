@@ -86,10 +86,10 @@ package body Config is
                   -- pragma Debug(Put_Line("Config: found_section => " &
                   -- Line(2..Found_Section_End)));
                   if Cfg.Case_Sensitive then
-                     In_Found_Section :=(Section = Line(Line'First+1..Found_Section_End));
+                     In_Found_Section := Section = Line(Line'First+1..Found_Section_End);
                   else
                      In_Found_Section :=
-                       (To_Lower(Section) = To_Lower(Line(Line'First+1..Found_Section_End)));
+                       To_Lower(Section) = To_Lower(Line(Line'First+1..Found_Section_End));
                   end if;
                when ';' | '#' =>
                   null; -- This is a full-line comment
@@ -285,6 +285,37 @@ package body Config is
      return Cfg.Config_File.all;
    end File_Name;
 
+   -- List of strings, for memorizing a config file.
+
+   type Ini_Line;
+   type Ini_Line_Ptr is access Ini_Line;
+   type Ini_Line is record
+     next: Ini_Line_Ptr:= null;
+     line: Str_Ptr;
+   end record;
+   procedure Free is new Ada.Unchecked_Deallocation(Ini_Line, Ini_Line_Ptr);
+
+
+   procedure Write_and_Free(Cfg         : in     Configuration;
+                            new_contents: in out Ini_Line_Ptr)
+   is
+      curr, to_free: Ini_Line_Ptr:= null;
+      use Ada.Text_IO;
+      File              : File_Type;
+   begin
+      Create(File, Out_File, Cfg.Config_File.all);
+      curr:= new_contents;
+      while curr /= null loop
+         Put_Line(File, curr.line.all);
+         to_free:= curr;
+         curr:= curr.next;
+         Free(to_free.line);
+         Free(to_free);
+      end loop;
+      Close(File);
+      new_contents:= null;
+   end Write_and_Free;
+
    procedure Replace_Value(Cfg     : in Configuration;
                            Section : in String;
                            Mark    : in String;
@@ -301,15 +332,7 @@ package body Config is
       File              : File_Type;
       use Ada.Strings.Fixed;
       --
-      type Ini_Line;
-      type Ini_Line_Ptr is access Ini_Line;
-      type Ini_Line is record
-        next: Ini_Line_Ptr:= null;
-        line: Str_Ptr;
-      end record;
-      procedure Free is new Ada.Unchecked_Deallocation(Ini_Line, Ini_Line_Ptr);
-      --
-      root, curr, new_ini_line, to_free: Ini_Line_Ptr:= null;
+      root, curr, new_ini_line: Ini_Line_Ptr:= null;
    begin
       Get_Value(Cfg, Section, Mark, Line, Value_Start, Value_End, Found_Line);
       if Found_Line = 0 then
@@ -330,29 +353,99 @@ package body Config is
          curr:= new_ini_line;
          --
          if Line_Count = Found_Line then -- Change this line
-            Equal_Ind := Index(Source  => Line(Line'First .. Line_End),
+            Equal_Ind := Index(Source  => Line(1 .. Line_End),
                                Pattern => "=");
-            if Equal_Ind < Line'First then -- No '=' yet, will change...
-              curr.line:= new String'(Line(Line'First .. Line_End) & '=' & New_Value);
+            if Equal_Ind < 1 then -- No '=' yet, will change...
+              curr.line:= new String'(Line(1 .. Line_End) & '=' & New_Value);
             else
-              curr.line:= new String'(Line(Line'First .. Equal_Ind) & New_Value);
+              curr.line:= new String'(Line(1 .. Equal_Ind) & New_Value);
             end if;
          else -- any other line: just copy
-            curr.line:= new String'(Line(Line'First .. Line_End));
+            curr.line:= new String'(Line(1 .. Line_End));
          end if;
       end loop Read_File;
       Close(File);
       -- Now, write the new file
-      Create(File, Out_File, Cfg.Config_File.all);
-      curr:= root;
-      while curr /= null loop
-         Put_Line(File, curr.line.all);
-         to_free:= curr;
-         curr:= curr.next;
-         Free(to_free.line);
-         Free(to_free);
-      end loop;
-      Close(File);
+      Write_and_Free(Cfg, root);
    end Replace_Value;
+
+   procedure Replace_Section(Cfg         : in Configuration;
+                             Section     : in String;
+                             New_Contents: in String)
+   is
+      Line              : String(1 .. Max_Line_Length);
+      Line_End          : Natural    := 0;
+      Line_Count        : Natural    := 0;
+      use Ada.Text_IO;
+      File              : File_Type;
+      use Ada.Strings.Fixed;
+      --
+      root, curr, new_ini_line: Ini_Line_Ptr:= null;
+      --
+      procedure List_progress is
+      begin
+         new_ini_line:= new Ini_Line;
+         if root = null then
+           root:= new_ini_line;
+         else
+           curr.next:= new_ini_line;
+         end if;
+         curr:= new_ini_line;
+      end;
+      --
+      Matched_section, Found_section: Boolean:= False;
+      I: Natural:= New_Contents'First;
+      use Ada.Characters.Handling;
+   begin
+      Open(File, In_File, Cfg.Config_File.all);
+      Read_File:
+      while not End_Of_File(File) loop
+         Get_Line(File, Line, Line_End);
+         Line_Count:= Line_Count + 1;
+         if Line_End > 0 and then
+            Line(1)= '['
+         then                     -- It is a section header.
+            Matched_section:=
+               Line_End >= 2 + Section'Length and then
+                 (
+                      (Cfg.Case_Sensitive and then
+                       Line(2..2 + Section'Length) = Section & ']'
+                      )
+                    or else
+                      ((not Cfg.Case_Sensitive) and then
+                        To_Lower(Line(2..2 + Section'Length)) = To_Lower(Section) & ']'
+                      )
+                 );
+            List_progress;
+            curr.line:= new String'(Line(1 .. Line_End));
+            if Matched_section then
+               Found_section:= True;
+               for J in New_Contents'Range loop -- copy new contents
+                  if New_contents(J)= LF then
+                     List_progress;
+                     curr.line:= new String'(New_contents(I .. J-1));
+                     I:= J+1;
+                  end if;
+                  if J = New_contents'Last then
+                     List_progress;
+                     curr.line:= new String'(New_contents(I .. J));
+                  end if;
+                  -- NB: we can have have a LF at the end, hence both "if"-s
+               end loop;
+            end if;
+         elsif Matched_section then
+            null; -- don't copy old contents
+         else
+            List_progress;
+            curr.line:= new String'(Line(1 .. Line_End));
+         end if;
+      end loop Read_File;
+      Close(File);
+      -- Now, write the new file
+      Write_and_Free(Cfg, root);
+      if not Found_Section then
+         raise Section_Not_found;
+      end if;
+   end Replace_Section;
 
 end Config;

@@ -17,7 +17,12 @@ procedure Test_Config is
      Put_Line(f, "ShowScheme =-1  ; another comment");
      Put_Line(f, "MyFloat = +123.456");
      New_Line(f);
-     Put_Line(f, "[Profile 2]");
+     Put_Line(f, "[Profile phantom] ; will be replaced");
+     Put_Line(f, "MyString = abcd...");
+     Put_Line(f, "ShowScheme =-1 ");
+     Put_Line(f, "MyFloat = +123.456");
+     New_Line(f);
+     Put_Line(f, "[Profile with errors]");
      Put_Line(f, "MyString");
      Put_Line(f, "ShowScheme = invalid integer! ");
      Put_Line(f, "MyFloat = invalid float!");
@@ -38,10 +43,11 @@ begin
   for a in reverse Type_Mismatch_Action loop
      Put_Line("*********** Behaviour: " & Type_Mismatch_Action'Image(a));
      -- In Ada 2005+ can be written as "c.Init(name)", and so on.
-     Init(c, name, On_Type_Mismatch => a);
-     Replace_Value(c, "Profile 2", "MyString", Type_Mismatch_Action'Image(a));
+     Init(c, name, Case_Sensitive => True, On_Type_Mismatch => a);
+     Replace_Value(c, "Profile with errors", "MyString", Type_Mismatch_Action'Image(a));
+     Replace_Section(c, "Profile phantom", "blabla=1" & LF & "blabla_final=2" & LF);
      Test("Profile 1");
-     Test("Profile 2");
+     Test("Profile with errors");
   end loop;
 end;
 

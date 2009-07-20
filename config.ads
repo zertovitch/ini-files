@@ -29,6 +29,7 @@
 
 -- Change log
 --
+-- 20-Jul-2009:  GdM: - Added Replace_Section
 -- 17-Jul-2009:  GdM: - Improved Replace_Value
 -- 15-Jul-2009:  GdM: - Added type Configuration to wrap name and options
 --                    - Added Replace_Value
@@ -110,7 +111,7 @@ package Config is
    -- The whole .ini file is rewritten each time, so it's rather a
    -- solution for making sporadic changes.
    -- For changing many values, it might be better to rewrite
-   -- the whole file in one go.
+   -- the whole file in one go, or at least use Replace_Section.
    --
    procedure Replace_Value(Cfg      : in Configuration;
                            Section  : in String;
@@ -118,6 +119,20 @@ package Config is
                            New_Value: in String);
 
    Location_Not_Found: exception;
+
+   -- Replace the full contents of a section with new contents.
+   -- Line breaks are obtained by inserting the LF character
+   -- (defined below) in the New_Contents string.
+   -- Replace_Section is especially useful for config files
+   -- shared by several programs, with not all sections in common.
+   --
+   procedure Replace_Section(Cfg         : in Configuration;
+                             Section     : in String;
+                             New_Contents: in String);
+
+   LF: constant Character:= Character'Val(10);
+
+   Section_Not_Found: exception;
 
 private
 
