@@ -1,14 +1,29 @@
-with Ada.Text_IO; use Ada.Text_IO;
 with Config; use Config;
+
+with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Command_Line;
 
 procedure Test_Config is
 
-  name: constant String:= "test_config.ini";
+  -- In a real application, where the current directory might change,
+  -- you may want to refer to the directory where the application has started:
 
-  procedure Create_ini is
+  function config_name return String is
+    full: constant String:= Ada.Command_Line.Command_Name;
+    last: Natural:= full'First-1;
+  begin
+    for i in full'Range loop
+      if full(i)='\' or full(i)='/' then
+        last:= i;
+      end if;
+    end loop;
+    return full(full'First..last) & "test_config.ini";
+  end;
+
+  procedure Create_ini_file is
      f: File_Type;
   begin
-     Create(f, Out_File, name);
+     Create(f, Out_File, config_name);
      Put_Line(f, "; Nice comment");
      Put_Line(f, "# Nice comment 2");
      New_Line(f);
@@ -17,7 +32,7 @@ procedure Test_Config is
      Put_Line(f, "ShowScheme =-1  ; another comment");
      Put_Line(f, "MyFloat = +123.456");
      New_Line(f);
-     Put_Line(f, "[Profile phantom] ; will be replaced");
+     Put_Line(f, "[Profile phantom] ; This section will be replaced during the test");
      Put_Line(f, "MyString = abcd...");
      Put_Line(f, "ShowScheme =-1 ");
      Put_Line(f, "MyFloat = +123.456");
@@ -27,27 +42,30 @@ procedure Test_Config is
      Put_Line(f, "ShowScheme = invalid integer! ");
      Put_Line(f, "MyFloat = invalid float!");
      Close(f);
-  end;
+  end Create_ini_file;
 
   c: Configuration;
 
-  procedure Test(sec: String) is
+  procedure Test_reading_ini(sec: String) is
   begin
      Put_Line( '{' & Value_Of(c, sec, "MyString") & '}');
      Put_Line( Integer'Image(Value_Of(c, sec, "ShowScheme")) );
      Put_Line( Float'Image(Value_Of(c, sec, "MyFloat")) );
-  end Test;
+  end Test_reading_ini;
 
 begin
-  Create_ini;
+  Create_ini_file;
   for a in reverse Type_Mismatch_Action loop
-     Put_Line("*********** Behaviour: " & Type_Mismatch_Action'Image(a));
-     -- In Ada 2005+ can be written as "c.Init(name)", and so on.
-     Init(c, name, Case_Sensitive => True, On_Type_Mismatch => a);
+     Put_Line("*********** Expected behaviour on bad input: " & Type_Mismatch_Action'Image(a) & " *****");
+     --
+     -- In Ada 2005+, "Init(c, name, ..." can be written as "c.Init(name, ...)", and so on.
+     --
+     Init(c, config_name, Case_Sensitive => True, On_Type_Mismatch => a);
+     --
      Replace_Value(c, "Profile with errors", "MyString", Type_Mismatch_Action'Image(a));
      Replace_Section(c, "Profile phantom", "blabla=1" & LF & "blabla_final=2" & LF);
-     Test("Profile 1");
-     Test("Profile with errors");
+     Test_reading_ini("Profile 1");
+     Test_reading_ini("Profile with errors");
   end loop;
 end;
 

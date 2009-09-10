@@ -42,6 +42,9 @@
 
 package Config is
 
+   web: constant String:= "http://sourceforge.net/projects/ini-files/";
+   -- ^-- hopefully the latest version is there
+
    type Configuration is tagged private;
 
    type Type_Mismatch_Action is ( Raise_Data_Error,
