@@ -50,7 +50,7 @@ procedure Test_Config is
   begin
      Put_Line( '{' & Value_Of(c, sec, "MyString") & '}');
      Put_Line( Integer'Image(Value_Of(c, sec, "ShowScheme")) );
-     Put_Line( Float'Image(Value_Of(c, sec, "MyFloat")) );
+     Put_Line( Long_Float'Image(Value_Of(c, sec, "MyFloat")) );
   end Test_reading_ini;
 
 begin

@@ -72,9 +72,9 @@ package Config is
                   );
 
 
-   -- We intentionally use the built in types Integer and Float to keep
+   -- We intentionally use the built-in types Integer and Long_Float to keep
    -- this package as portable as possible and to avoid unnecessary project
-   -- dependancies.  Clients of this package generally can directly convert
+   -- dependencies.  Clients of this package generally can directly convert
    -- to the target types.
    --
    function Value_Of(Cfg     : in Configuration;
@@ -90,7 +90,7 @@ package Config is
    function Value_Of(Cfg     : in Configuration;
                      Section : in String;
                      Mark    : in String;
-                     Default : in Float := 0.0) return Float;
+                     Default : in Long_Float := 0.0) return Long_Float;
 
    function Value_Of(Cfg     : in Configuration;
                      Section : in String;

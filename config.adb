@@ -1,7 +1,6 @@
 -- Created On      : Fri Apr 26 08:13:44 1996
 
 with Ada.Text_IO;
-with Ada.Float_Text_IO;
 with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
 with Ada.Characters.Handling;
@@ -223,19 +222,20 @@ package body Config is
    function Value_Of(Cfg     : in Configuration;
                      Section : in String;
                      Mark    : in String;
-                     Default : in Float := 0.0)
-                    return Float
+                     Default : in Long_Float := 0.0)
+                    return Long_Float
    is
       Value_As_String : constant String := Value_Of(Cfg, Section, Mark);
-      Val  : Float;
+      Val  : Long_Float;
       Last : Positive;
+      package LFIO is new Ada.Text_IO.Float_IO(Long_FLoat);
    begin
       if Value_As_String'Length > 0 and then
          Is_number_start(Value_As_String(Value_As_String'First))
       then
          -- Val := Float'Value(Value_As_String);
          -- ^ an old compiler doesn't like some floats repr. through 'Value
-         Ada.Float_Text_IO.Get(Value_As_String, Val, Last);
+         LFIO.Get(Value_As_String, Val, Last);
          return Val;
       else
          Type_Error(Cfg, Value_As_String, "a floating-point number");
