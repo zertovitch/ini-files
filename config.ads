@@ -2,7 +2,7 @@
 --  Config - A simple package for parsing and modifying configuration files
 --           (also known as .ini, .inf, .cfg, ... files)
 --
---  Copyright (c) Rolf Ebert 1996..2009
+--  Copyright (c) Rolf Ebert 1996..2010
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@
 
 -- Change log
 --
+-- 18-Mar-2010:  GdM: - Float replaced by Long_Float
 -- 20-Jul-2009:  GdM: - Added Replace_Section
 -- 17-Jul-2009:  GdM: - Improved Replace_Value
 -- 15-Jul-2009:  GdM: - Added type Configuration to wrap name and options

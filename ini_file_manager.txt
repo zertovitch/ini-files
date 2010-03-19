@@ -1,0 +1,69 @@
+Intro to the Ini file manager
+=============================
+The Ini file manager consists of a package, Config, which
+can read informations from various configuration files known
+as "ini" files because they have often the ".ini" extension.
+They are text files which look like the following:
+
+; Comment line
+[Section 1]
+a_string = abcd     # a comment here...
+a_number = +123.456 ; another comment
+[Section 2]
+a_string = efgh
+
+For more examples, just search files with *.ini on your computer!
+
+  with Config; use Config;
+  with Ada.Text_IO; use Ada.Text_IO;
+
+  procedure Small_demo is
+    c: Configuration;
+  begin
+    Init(c, "config.ini");
+    Put_Line( Value_Of(c, "Section 2", "a_string"));
+  end;
+
+Contents
+========
+  - config.ads           : package specification
+  - config.adb           : package body
+  - test_config.adb      : test/demo procedure
+  - ini_file_manager.txt : this file
+
+Warning & legal
+===============
+There is NO WARRANTY in this software. Read copyright notice in config.ads.
+  
+How to build and test the Ini file manager
+==========================================
+Here is how to build with GNAT/GCC (for other compilers, it
+should be simple as well):
+    - type "gnatmake test_config" in the command line
+or
+    - create a project within the GNAT Programming Studio (GPS),
+      include config.ads, config.adb, test_config.adb; press F4
+or
+    - open test_config.adb with AdaGIDE, press F3
+or
+    - your way...
+
+As a result there is a test_config[.exe] executable.
+
+How to use the Ini file manager
+===============================
+Chances are that the only usage you'll make of Config will be to
+read values from a configuration file. This is done with the
+function Value_Of as in the example above.
+
+If you need to update the configuration file, you can replace single
+values (Replace_Value) or whole sections (Replace_Section).
+If you need to rewrite the entire configuration file, it is simpler
+to do it in one go, with Put_Line's.
+
+Look at test_config.adb for a complete example, especially when it
+comes to handle numerical errors contained in a configuration file.
+
+Enjoy!
+
+Gautier de Montmollin & Rolf Ebert
