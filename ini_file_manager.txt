@@ -12,11 +12,13 @@ a_number = +123.456 ; another comment
 [Section 2]
 a_string = efgh
 
-For more examples, just search files with *.ini on your computer!
+For more examples in this format, just search files with
+the .ini extension on your computer!
+The Config package is typically used as in
+the following demo procedure:
 
   with Config; use Config;
   with Ada.Text_IO; use Ada.Text_IO;
-
   procedure Small_demo is
     c: Configuration;
   begin
