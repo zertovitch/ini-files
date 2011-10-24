@@ -1,0 +1,15 @@
+-- Project file for GNAT/GCC or the GNAT Programming Studio (GPS)
+-- Build me with "gnatmake -P ini_files.gpr", or open me with GPS
+--
+project Ini_files is 
+
+   for Main use ("test_config.adb");
+   for Source_Dirs use (".");
+   for Object_Dir use "obj";
+   for Exec_Dir use ".";
+   package Ide is
+      for Default_Switches ("adacontrol") use ("-f", "verif.aru");
+   end Ide;
+   
+end Ini_files;
+
