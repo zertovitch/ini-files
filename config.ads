@@ -2,7 +2,7 @@
 --  Config - A simple package for parsing and modifying configuration files
 --           (also known as .ini, .inf, .cfg, ... files)
 --
---  Copyright (c) Rolf Ebert 1996..2010
+--  Copyright (c) Rolf Ebert 1996..2011
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,10 @@
 
 -- Change log
 --
--- 18-Mar-2010:  GdM: - Float replaced by Long_Float
--- 20-Jul-2009:  GdM: - Added Replace_Section
--- 17-Jul-2009:  GdM: - Improved Replace_Value
+-- 26-Oct-2011:  GdM/DB: Init also as a function
+-- 18-Mar-2010:  GdM: Float replaced by Long_Float
+-- 20-Jul-2009:  GdM: Added Replace_Section
+-- 17-Jul-2009:  GdM: Improved Replace_Value
 -- 15-Jul-2009:  GdM: - Added type Configuration to wrap name and options
 --                    - Added Replace_Value
 --                    - A few fixes
@@ -52,60 +53,66 @@ package Config is
                                   Print_Warning,
                                   Be_Quiet );
 
-   -- Initialize the package by providing the absolute path to the
+   -- Initialize a Configuration object by providing the absolute path to the
    -- file where the configuration parameters are stored.  The
    -- routine can be called multiple times to read several files.
    --
    procedure Init(Cfg              : out Configuration;
-                  File_Name        :  in String;
+                  File_Name        :     String;
                   --
                   -- Read the config file in a case sensitive way if True, i.e. Section
                   -- and Mark must match exactly the upper and lower case spelling.  If
                   -- set False, case is irrelevant for Section and Mark.  The return value
                   -- still contains the exact case as in the config file.
-                  Case_Sensitive   :  in Boolean := True;
+                  Case_Sensitive   :     Boolean := True;
                   --
                   -- What to do in case the found mark does not match the expected type
                   -- (e.g. the program wants an integer, but the config file contains a
                   -- string)
-                  On_Type_Mismatch :  in Type_Mismatch_Action := Raise_Data_Error
+                  On_Type_Mismatch :     Type_Mismatch_Action := Raise_Data_Error
                   --
                   );
 
+   -- Same, as a function (can be used in a declaration part as a constructor)
+   function Init(File_Name        :  String;
+                 Case_Sensitive   :  Boolean := True;
+                 On_Type_Mismatch :  Type_Mismatch_Action := Raise_Data_Error
+                 )
+   return Configuration;
 
    -- We intentionally use the built-in types Integer and Long_Float to keep
    -- this package as portable as possible and to avoid unnecessary project
    -- dependencies.  Clients of this package generally can directly convert
    -- to the target types.
    --
-   function Value_Of(Cfg     : in Configuration;
-                     Section : in String;
-                     Mark    : in String;
-                     Default : in String := "") return String;
+   function Value_Of(Cfg     : Configuration;
+                     Section : String;
+                     Mark    : String;
+                     Default : String := "") return String;
 
-   function Value_Of(Cfg     : in Configuration;
-                     Section : in String;
-                     Mark    : in String;
-                     Default : in Integer := 0) return Integer;
+   function Value_Of(Cfg     : Configuration;
+                     Section : String;
+                     Mark    : String;
+                     Default : Integer := 0) return Integer;
 
-   function Value_Of(Cfg     : in Configuration;
-                     Section : in String;
-                     Mark    : in String;
-                     Default : in Long_Float := 0.0) return Long_Float;
+   function Value_Of(Cfg     : Configuration;
+                     Section : String;
+                     Mark    : String;
+                     Default : Long_Float := 0.0) return Long_Float;
 
-   function Value_Of(Cfg     : in Configuration;
-                     Section : in String;
-                     Mark    : in String;
-                     Default : in Boolean := False) return Boolean;
+   function Value_Of(Cfg     : Configuration;
+                     Section : String;
+                     Mark    : String;
+                     Default : Boolean := False) return Boolean;
 
    -- Return True if one of the following conditions is met:
    --  o the Mark is within the Section, but no equal sign is in that line,
    --  o the Mark is set to either 1, True or Yes.
    -- All other cases return False.
    --
-   function Is_Set(Cfg     : in Configuration;
-                   Section : in String;
-                   Mark    : in String) return Boolean;
+   function Is_Set(Cfg     : Configuration;
+                   Section : String;
+                   Mark    : String) return Boolean;
 
    -- Get the file name, e.g. to rewrite a fresh new config file.
    --
@@ -117,10 +124,10 @@ package Config is
    -- For changing many values, it might be better to rewrite
    -- the whole file in one go, or at least use Replace_Section.
    --
-   procedure Replace_Value(Cfg      : in Configuration;
-                           Section  : in String;
-                           Mark     : in String;
-                           New_Value: in String);
+   procedure Replace_Value(Cfg      : Configuration;
+                           Section  : String;
+                           Mark     : String;
+                           New_Value: String);
 
    Location_Not_Found: exception;
 
@@ -130,9 +137,9 @@ package Config is
    -- Replace_Section is especially useful for config files
    -- shared by several programs, with not all sections in common.
    --
-   procedure Replace_Section(Cfg         : in Configuration;
-                             Section     : in String;
-                             New_Contents: in String);
+   procedure Replace_Section(Cfg         : Configuration;
+                             Section     : String;
+                             New_Contents: String);
 
    LF: constant Character:= Character'Val(10);
 
@@ -143,7 +150,7 @@ private
    type Str_Ptr is access String;
 
    type Configuration is tagged record
-      Config_File      : Str_Ptr:= null;
+      Config_File      : Str_Ptr := null;
       Case_Sensitive   : Boolean := True;
       On_Type_Mismatch : Type_Mismatch_Action := Raise_Data_Error;
    end record;

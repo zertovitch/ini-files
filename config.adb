@@ -11,9 +11,9 @@ package body Config is
    procedure Free is new Ada.Unchecked_Deallocation(String, Str_Ptr);
 
    procedure Init(Cfg              : out Configuration;
-                  File_Name        :  in String;
-                  Case_Sensitive   :  in Boolean := True;
-                  On_Type_Mismatch :  in Type_Mismatch_Action := Raise_Data_Error
+                  File_Name        :     String;
+                  Case_Sensitive   :     Boolean := True;
+                  On_Type_Mismatch :     Type_Mismatch_Action := Raise_Data_Error
                   )
    is
    begin
@@ -21,6 +21,18 @@ package body Config is
       Cfg.Config_File := new String'(File_Name);
       Cfg.Case_Sensitive:= Case_Sensitive;
       Cfg.On_Type_Mismatch:= On_Type_Mismatch;
+   end Init;
+
+   function Init(File_Name        :  String;
+                 Case_Sensitive   :  Boolean := True;
+                 On_Type_Mismatch :  Type_Mismatch_Action := Raise_Data_Error
+                 )
+   return Configuration
+   is
+      Cfg: Configuration;
+   begin
+      Init(Cfg, File_Name, Case_Sensitive, On_Type_Mismatch);
+      return Cfg;
    end Init;
 
    function Is_number_start(c: Character) return Boolean is
@@ -151,11 +163,11 @@ package body Config is
 
    Max_Line_Length: constant:= 1000;
 
-   function Value_Of(Cfg     : in Configuration;
-                     Section : in String;
-                     Mark    : in String;
-                     Default : in String := "")
-                    return String
+   function Value_Of(Cfg     : Configuration;
+                     Section : String;
+                     Mark    : String;
+                     Default : String := "")
+   return String
    is
       Line              : String(1 .. Max_Line_Length);
       Value_Start       : Natural;
@@ -170,7 +182,7 @@ package body Config is
       end if;
    end Value_Of;
 
-   procedure Type_Error(Cfg: in Configuration; Val, Desc: String) is
+   procedure Type_Error(Cfg: Configuration; Val, Desc: String) is
       use Ada.Text_IO;
    begin
       case Cfg.On_Type_Mismatch is
@@ -188,11 +200,11 @@ package body Config is
       end case;
    end Type_Error;
 
-   function Value_Of(Cfg     : in Configuration;
-                     Section : in String;
-                     Mark    : in String;
-                     Default : in Integer := 0)
-                    return Integer
+   function Value_Of(Cfg     : Configuration;
+                     Section : String;
+                     Mark    : String;
+                     Default : Integer := 0)
+   return Integer
    is
       Value_As_String : constant String := Value_Of(Cfg, Section, Mark);
    begin
@@ -219,11 +231,11 @@ package body Config is
    end Value_Of;
 
 
-   function Value_Of(Cfg     : in Configuration;
-                     Section : in String;
-                     Mark    : in String;
-                     Default : in Long_Float := 0.0)
-                    return Long_Float
+   function Value_Of(Cfg     : Configuration;
+                     Section : String;
+                     Mark    : String;
+                     Default : Long_Float := 0.0)
+   return Long_Float
    is
       Value_As_String : constant String := Value_Of(Cfg, Section, Mark);
       Val  : Long_Float;
@@ -233,7 +245,7 @@ package body Config is
       if Value_As_String'Length > 0 and then
          Is_number_start(Value_As_String(Value_As_String'First))
       then
-         -- Val := Float'Value(Value_As_String);
+         -- Val := Long_Float'Value(Value_As_String);
          -- ^ an old compiler doesn't like some floats repr. through 'Value
          LFIO.Get(Value_As_String, Val, Last);
          return Val;
@@ -247,10 +259,11 @@ package body Config is
          return Default;
    end Value_Of;
 
-   function Value_Of(Cfg     : in Configuration;
-                     Section : in String;
-                     Mark    : in String;
-                     Default : in Boolean := False) return Boolean
+   function Value_Of(Cfg     : Configuration;
+                     Section : String;
+                     Mark    : String;
+                     Default : Boolean := False)
+   return Boolean
    is
    begin
       return Boolean'Value(Value_Of(Cfg, Section, Mark, Boolean'Image(Default)));
@@ -260,10 +273,10 @@ package body Config is
    --  o the Mark is within the Section, but no equal sign is in that line,
    --  o the Mark is set to either 1, True or Yes.
    -- All other cases return False.
-   function Is_Set(Cfg     : in Configuration;
-                   Section : in String;
-                   Mark    : in String)
-                  return Boolean is
+   function Is_Set(Cfg     : Configuration;
+                   Section : String;
+                   Mark    : String)
+   return Boolean is
       use Ada.Characters.Handling;
       Line              : String(1 .. Max_Line_Length);
       Value_Start       : Natural;
@@ -316,10 +329,10 @@ package body Config is
       new_contents:= null;
    end Write_and_Free;
 
-   procedure Replace_Value(Cfg     : in Configuration;
-                           Section : in String;
-                           Mark    : in String;
-                           New_Value: in String)
+   procedure Replace_Value(Cfg      : Configuration;
+                           Section  : String;
+                           Mark     : String;
+                           New_Value: String)
    is
       Line              : String(1 .. Max_Line_Length);
       Value_Start       : Natural;
@@ -369,9 +382,9 @@ package body Config is
       Write_and_Free(Cfg, root);
    end Replace_Value;
 
-   procedure Replace_Section(Cfg         : in Configuration;
-                             Section     : in String;
-                             New_Contents: in String)
+   procedure Replace_Section(Cfg         : Configuration;
+                             Section     : String;
+                             New_Contents: String)
    is
       Line              : String(1 .. Max_Line_Length);
       Line_End          : Natural    := 0;
