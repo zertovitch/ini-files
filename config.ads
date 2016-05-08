@@ -2,7 +2,7 @@
 --  Config - A simple package for parsing and modifying configuration files
 --           (also known as .ini, .inf, .cfg, ... files)
 --
---  Copyright (c) Rolf Ebert 1996..2011
+--  Copyright (c) Rolf Ebert 1996 .. 2016
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -40,7 +40,6 @@
 --
 
 -- Created On      : Fri Apr 26 08:09:14 1996
-
 
 package Config is
 

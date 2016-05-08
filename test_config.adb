@@ -37,7 +37,7 @@ procedure Test_Config is
      Put_Line(f, "ShowScheme =-1 ");
      Put_Line(f, "MyFloat = +123.456");
      New_Line(f);
-     Put_Line(f, "[Profile with errors]");
+     Put_Line(f, "[Profile containing errors]");
      Put_Line(f, "MyString");
      Put_Line(f, "ShowScheme = invalid integer! ");
      Put_Line(f, "MyFloat = invalid float!");
@@ -64,13 +64,11 @@ begin
      --
      -- In Ada 2005+, "Init(c, name, ..." can be written as "c.Init(name, ...)", and so on.
      --
-     c:= Init(config_name, Case_Sensitive => True, On_Type_Mismatch => a);
+     c:= Init(Config_name, Case_Sensitive => True, On_Type_Mismatch => a);
      --
-     Replace_Value(c, "Profile with errors", "MyString", Type_Mismatch_Action'Image(a));
+     Replace_Value(c, "Profile containing errors", "MyString", Type_Mismatch_Action'Image(a));
      Replace_Section(c, "Profile phantom", "blabla=1" & LF & "blabla_final=2" & LF);
      Test_reading_ini("Profile 1");
-     Test_reading_ini("Profile with errors");
+     Test_reading_ini("Profile containing errors");
   end loop;
 end Test_Config;
-
-

@@ -192,7 +192,7 @@ package body Config is
          when Print_Warning    =>
             Put_Line(
                Standard_Error,
-               "Config: warning: `" & val & "' is not " & desc
+               "Config: warning: `" & Val & "' is not " & Desc
             );
 
          when Be_Quiet         =>
@@ -229,7 +229,6 @@ package body Config is
          Type_Error(Cfg, Value_As_String, "an integer number");
          return Default;
    end Value_Of;
-
 
    function Value_Of(Cfg     : Configuration;
                      Section : String;
@@ -308,7 +307,6 @@ package body Config is
    end record;
    procedure Free is new Ada.Unchecked_Deallocation(Ini_Line, Ini_Line_Ptr);
 
-
    procedure Write_and_Free(Cfg         : in     Configuration;
                             new_contents: in out Ini_Line_Ptr)
    is
@@ -349,7 +347,7 @@ package body Config is
    begin
       Get_Value(Cfg, Section, Mark, Line, Value_Start, Value_End, Found_Line);
       if Found_Line = 0 then
-         raise Location_Not_found;
+         raise Location_Not_Found;
       end if;
       Open(File, In_File, Cfg.Config_File.all);
       Read_File:
@@ -434,14 +432,14 @@ package body Config is
             if Matched_section then
                Found_section:= True;
                for J in New_Contents'Range loop -- copy new contents
-                  if New_contents(J)= LF then
+                  if New_Contents(J)= LF then
                      List_progress;
-                     curr.line:= new String'(New_contents(I .. J-1));
+                     curr.line:= new String'(New_Contents(I .. J-1));
                      I:= J+1;
                   end if;
-                  if J = New_contents'Last then
+                  if J = New_Contents'Last then
                      List_progress;
-                     curr.line:= new String'(New_contents(I .. J));
+                     curr.line:= new String'(New_Contents(I .. J));
                   end if;
                   -- NB: we can have have a LF at the end, hence both "if"-s
                end loop;
@@ -456,8 +454,8 @@ package body Config is
       Close(File);
       -- Now, write the new file
       Write_and_Free(Cfg, root);
-      if not Found_Section then
-         raise Section_Not_found;
+      if not Found_section then
+         raise Section_Not_Found;
       end if;
    end Replace_Section;
 
