@@ -10,10 +10,11 @@ package body Config is
 
    procedure Free is new Ada.Unchecked_Deallocation(String, Str_Ptr);
 
-   procedure Init(Cfg              : out Configuration;
-                  File_Name        :     String;
-                  Case_Sensitive   :     Boolean := True;
-                  On_Type_Mismatch :     Type_Mismatch_Action := Raise_Data_Error
+   procedure Init(Cfg                 : out Configuration;
+                  File_Name           :     String;
+                  Case_Sensitive      :     Boolean := True;
+                  On_Type_Mismatch    :     Type_Mismatch_Action := Raise_Data_Error;
+                  Variable_Terminator :     Character := '='
                   )
    is
    begin
@@ -21,17 +22,19 @@ package body Config is
       Cfg.Config_File := new String'(File_Name);
       Cfg.Case_Sensitive:= Case_Sensitive;
       Cfg.On_Type_Mismatch:= On_Type_Mismatch;
+      Cfg.Variable_Terminator:= Variable_Terminator;
    end Init;
 
-   function Init(File_Name        :  String;
-                 Case_Sensitive   :  Boolean := True;
-                 On_Type_Mismatch :  Type_Mismatch_Action := Raise_Data_Error
+   function Init(File_Name           :  String;
+                 Case_Sensitive      :  Boolean := True;
+                 On_Type_Mismatch    :  Type_Mismatch_Action := Raise_Data_Error;
+                 Variable_Terminator :  Character := '='
                  )
    return Configuration
    is
       Cfg: Configuration;
    begin
-      Init(Cfg, File_Name, Case_Sensitive, On_Type_Mismatch);
+      Init(Cfg, File_Name, Case_Sensitive, On_Type_Mismatch, Variable_Terminator);
       return Cfg;
    end Init;
 
@@ -115,7 +118,7 @@ package body Config is
                         Line_End := Comment_Ind - 1;
                      end if;
                      Equal_Ind := Index(Source  => Line(Line'First .. Line_End),
-                                        Pattern => "=");
+                                        Pattern => (1 => Cfg.Variable_Terminator));
                      if Equal_Ind >= Line'First then
                         Found_Mark_Start :=
                           Index_Non_Blank(Line(Line'First .. Equal_Ind-1), Forward);
@@ -127,8 +130,9 @@ package body Config is
                         Found_Mark_End :=
                           Index_Non_Blank(Line(Line'First .. Line_End), Backward);
                      end if;
-                     -- pragma Debug(Put_Line("Config: found_mark    => " &
-                     -- Line(Found_Mark_start..Found_Mark_End)));
+                     --   Put_Line("Config: found_mark    => [" &
+                     --   Line(Found_Mark_start..Found_Mark_End) & "] equal ind=" & Equal_Ind'Img &
+                     --   " termi=[" & Cfg.Variable_Terminator & ']');
                      if Found_Mark_Start > 0 and then
                        Found_Mark_End > 0
                      then
@@ -365,7 +369,7 @@ package body Config is
          --
          if Line_Count = Found_Line then -- Change this line
             Equal_Ind := Index(Source  => Line(1 .. Line_End),
-                               Pattern => "=");
+                               Pattern => (1 => Cfg.Variable_Terminator));
             if Equal_Ind < 1 then -- No '=' yet, will change...
               curr.line:= new String'(Line(1 .. Line_End) & '=' & New_Value);
             else

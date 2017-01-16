@@ -2,7 +2,7 @@
 --  Config - A simple package for parsing and modifying configuration files
 --           (also known as .ini, .inf, .cfg, ... files)
 --
---  Copyright (c) Rolf Ebert 1996 .. 2016
+--  Copyright (c) Rolf Ebert & Gautier de Montmollin 1996 .. 2017
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@
 
 -- Change log
 --
+-- 16-Jan-2017:  GdM: Variable terminator symbol can be different than '='
 -- 26-Oct-2011:  GdM/DB: Init also as a function
 -- 18-Mar-2010:  GdM: Float replaced by Long_Float
 -- 20-Jul-2009:  GdM: Added Replace_Section
@@ -68,17 +69,25 @@ package Config is
                   -- What to do in case the found mark does not match the expected type
                   -- (e.g. the program wants an integer, but the config file contains a
                   -- string)
-                  On_Type_Mismatch :     Type_Mismatch_Action := Raise_Data_Error
+                  On_Type_Mismatch :     Type_Mismatch_Action := Raise_Data_Error;
+                  -- Some configuration files have the form "Var value" instead of
+                  -- "Var=value". Of course, if Variable_Terminator = ' ', variable
+                  -- names cannot have a space in them.
+                  Variable_Terminator :     Character := '='
                   --
                   );
 
    -- Same, as a function (can be used in a declaration part as a constructor)
-   function Init(File_Name        :  String;
-                 Case_Sensitive   :  Boolean := True;
-                 On_Type_Mismatch :  Type_Mismatch_Action := Raise_Data_Error
+   function Init(File_Name           :  String;
+                 Case_Sensitive      :  Boolean := True;
+                 On_Type_Mismatch    :  Type_Mismatch_Action := Raise_Data_Error;
+                 Variable_Terminator :  Character := '='
                  )
    return Configuration;
 
+   -- Value_Of : getting values from a configuration file.
+   -- If the Section is "*", the Mark is looked for in the whole configuration file.
+   --
    -- We intentionally use the built-in types Integer and Long_Float to keep
    -- this package as portable as possible and to avoid unnecessary project
    -- dependencies.  Clients of this package generally can directly convert
@@ -149,9 +158,10 @@ private
    type Str_Ptr is access String;
 
    type Configuration is tagged record
-      Config_File      : Str_Ptr := null;
-      Case_Sensitive   : Boolean := True;
-      On_Type_Mismatch : Type_Mismatch_Action := Raise_Data_Error;
+      Config_File          : Str_Ptr := null;
+      Case_Sensitive       : Boolean := True;
+      On_Type_Mismatch     : Type_Mismatch_Action := Raise_Data_Error;
+      Variable_Terminator  : Character := '=';
    end record;
 
 end Config;
