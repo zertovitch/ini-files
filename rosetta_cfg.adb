@@ -7,8 +7,8 @@ procedure Rosetta_Cfg is
   cfg: Configuration:= Init("rosetta.cfg", Variable_Terminator => ' ');
   fullname       : String  := Value_Of(cfg, "*", "FULLNAME");
   favouritefruit : String  := Value_Of(cfg, "*", "FAVOURITEFRUIT");
-  needspeeling   : Boolean := Value_Of(cfg, "*", "NEEDSPEELING", Default => True);
-  seedsremoved   : Boolean := Value_Of(cfg, "*", "SEEDSREMOVED");
+  needspeeling   : Boolean :=   Is_Set(cfg, "*", "NEEDSPEELING");
+  seedsremoved   : Boolean :=   Is_Set(cfg, "*", "SEEDSREMOVED");
   otherfamily    : String  := Value_Of(cfg, "*", "OTHERFAMILY");
 begin
   Put_Line("fullname = "       & fullname);
