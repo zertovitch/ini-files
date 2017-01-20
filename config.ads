@@ -109,7 +109,7 @@ package Config is
                      Default : Long_Float := 0.0) return Long_Float;
 
    -- Value_Of for Boolean: you may also want to consider the Is_Set function below.
-   --   
+   --
    function Value_Of(Cfg     : Configuration;
                      Section : String;
                      Mark    : String;

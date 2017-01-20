@@ -3,8 +3,8 @@
 with Config; use Config;
 with Ada.Text_IO; use Ada.Text_IO;
 
-procedure Rosetta_Cfg is
-  cfg: Configuration:= Init("rosetta.cfg", Variable_Terminator => ' ');
+procedure Rosetta_Read_Cfg is
+  cfg: Configuration:= Init("rosetta_read.cfg", Variable_Terminator => ' ');
   fullname       : String  := Value_Of(cfg, "*", "FULLNAME");
   favouritefruit : String  := Value_Of(cfg, "*", "FAVOURITEFRUIT");
   needspeeling   : Boolean :=   Is_Set(cfg, "*", "NEEDSPEELING");
