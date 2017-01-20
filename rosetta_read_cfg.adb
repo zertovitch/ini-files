@@ -4,12 +4,12 @@ with Config; use Config;
 with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Rosetta_Read_Cfg is
-  cfg: Configuration:= Init("rosetta_read.cfg", Variable_Terminator => ' ');
-  fullname       : String  := Value_Of(cfg, "*", "FULLNAME");
-  favouritefruit : String  := Value_Of(cfg, "*", "FAVOURITEFRUIT");
-  needspeeling   : Boolean :=   Is_Set(cfg, "*", "NEEDSPEELING");
-  seedsremoved   : Boolean :=   Is_Set(cfg, "*", "SEEDSREMOVED");
-  otherfamily    : String  := Value_Of(cfg, "*", "OTHERFAMILY");
+  cfg: Configuration:= Init("rosetta_read.cfg", Case_Sensitive => False, Variable_Terminator => ' ');
+  fullname       : String  := cfg.Value_Of("*", "fullname");
+  favouritefruit : String  := cfg.Value_Of("*", "favouritefruit");
+  needspeeling   : Boolean :=   cfg.Is_Set("*", "needspeeling");
+  seedsremoved   : Boolean :=   cfg.Is_Set("*", "seedsremoved");
+  otherfamily    : String  := cfg.Value_Of("*", "otherfamily");
 begin
   Put_Line("fullname = "       & fullname);
   Put_Line("favouritefruit = " & favouritefruit);
