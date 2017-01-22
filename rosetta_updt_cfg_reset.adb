@@ -1,6 +1,8 @@
 --  Create (reset) the configuration file, then call the Rosetta_Updt_Cfg demo
 
 with Rosetta_Updt_Cfg;
+
+with Ada.Command_Line; use Ada.Command_Line;
 with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Rosetta_Updt_Cfg_Reset is
@@ -39,5 +41,7 @@ procedure Rosetta_Updt_Cfg_Reset is
 begin
   Write_Cfg_file("rosetta_updt_BEFORE.cfg");
   Write_Cfg_file("rosetta_updt.cfg");
-  Rosetta_Updt_Cfg;
+  if Argument_Count > 0 then
+    Rosetta_Updt_Cfg;
+  end if;
 end;
