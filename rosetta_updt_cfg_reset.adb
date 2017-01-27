@@ -1,4 +1,5 @@
---  Create (reset) the configuration file, then call the Rosetta_Updt_Cfg demo
+--  Create (reset) the configuration file, then call the Rosetta_Updt_Cfg demo.
+--  The config file to be modified will be changed only if there is any command-line argument.
 
 with Rosetta_Updt_Cfg;
 
@@ -39,7 +40,7 @@ procedure Rosetta_Updt_Cfg_Reset is
   end;
 
 begin
-  Write_Cfg_file("rosetta_updt_BEFORE.cfg");
+  Write_Cfg_file("rosetta_BEFORE_updt.cfg");
   Write_Cfg_file("rosetta_updt.cfg");
   if Argument_Count > 0 then
     Rosetta_Updt_Cfg;

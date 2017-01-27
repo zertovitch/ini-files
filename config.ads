@@ -155,6 +155,12 @@ package Config is
 
    Section_Not_Found: exception;
 
+   --  Disable the Mark using a semicolon prefix
+   --
+   procedure Disable(Cfg      : Configuration;
+                     Section  : String;
+                     Mark     : String);
+
 private
 
    type Str_Ptr is access String;
