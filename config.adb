@@ -38,7 +38,8 @@ package body Config is
       return Cfg;
    end Init;
 
-   function Is_number_start(c: Character) return Boolean is
+
+   function Is_Number_Start (c: Character) return Boolean is
    begin
       case c is
          when '0'..'9' | '+' | '-' =>
@@ -46,7 +47,8 @@ package body Config is
          when others =>
             return False;
       end case;
-   end Is_number_start;
+   end Is_Number_Start;
+
 
    -- Internal
    --
@@ -105,6 +107,7 @@ package body Config is
                      In_Found_Section :=
                        To_Lower(Section) = To_Lower(Line(Line'First+1..Found_Section_End));
                   end if;
+
                when ';' | '#' =>
                   null; -- This is a full-line comment
                when others =>
@@ -188,16 +191,14 @@ package body Config is
 
    procedure Type_Error(Cfg: Configuration; Val, Desc: String) is
       use Ada.Text_IO;
+      Err_Msg : constant String := "'" & Val & "' is not " & Desc;
    begin
       case Cfg.On_Type_Mismatch is
          when Raise_Data_Error =>
-            raise Ada.Text_IO.Data_Error;
+            raise Ada.Text_IO.Data_Error with Err_Msg;
 
          when Print_Warning    =>
-            Put_Line(
-               Standard_Error,
-               "Config: warning: `" & Val & "' is not " & Desc
-            );
+            Put_Line(Standard_Error, "Config: warning: " & Err_Msg);
 
          when Be_Quiet         =>
             null;
@@ -210,27 +211,38 @@ package body Config is
                      Default : Integer := 0)
    return Integer
    is
-      Value_As_String : constant String := Value_Of(Cfg, Section, Mark);
+      Line              : String(1 .. Max_Line_Length);
+      Value_Start       : Natural;
+      Value_End         : Natural;
+      Found_Line        : Natural;
    begin
-      if Value_As_String'Length > 2 and then
-        Value_As_String(Value_As_String'First..Value_As_String'First+1) = "0x"
-      then
-         return Integer'Value("16#" &
-                              Value_As_String(Value_As_String'First+2 ..
-                                              Value_As_String'Last) &
-                              "#");
-      elsif Value_As_String'Length > 0  and then
-         Is_number_start(Value_As_String(Value_As_String'First))
-      then
-         return Integer'Value(Value_As_String);
-      else
-         Type_Error(Cfg, Value_As_String, "an integer number");
+      Get_Value(Cfg, Section, Mark, Line, Value_Start, Value_End, Found_Line);
+
+      if Found_Line = 0 then
          return Default;
       end if;
 
+      declare
+         Value_As_String : constant String := Line (Value_Start .. Value_End);
+      begin
+         if Value_As_String'Length > 2 and then
+           Line (Value_Start .. Value_Start+1) = "0x"
+         then
+            return Integer'Value("16#" &
+                                   Line(Value_Start+2 .. Value_End) &
+                                   "#");
+         elsif Value_As_String'Length > 0  and then
+           Is_Number_Start(Line(Value_Start))
+         then
+            return Integer'Value(Value_As_String);
+         else
+            Type_Error(Cfg, Value_As_String, "an integer number in line"&Found_Line'Img);
+            return Default;
+         end if;
+      end;
    exception
       when others =>
-         Type_Error(Cfg, Value_As_String, "an integer number");
+         Type_Error(Cfg, Line (Value_Start..Value_End), "an integer number in line"&Found_Line'Img);
          return Default;
    end Value_Of;
 
@@ -246,7 +258,7 @@ package body Config is
       package LFIO is new Ada.Text_IO.Float_IO(Long_FLoat);
    begin
       if Value_As_String'Length > 0 and then
-         Is_number_start(Value_As_String(Value_As_String'First))
+         Is_Number_Start(Value_As_String(Value_As_String'First))
       then
          -- Val := Long_Float'Value(Value_As_String);
          -- ^ an old compiler doesn't like some floats repr. through 'Value
@@ -463,6 +475,7 @@ package body Config is
       end if;
    end Replace_Section;
 
+
    --  Disable the Mark using a semicolon prefix
    --
    procedure Disable(Cfg      : Configuration;
@@ -509,5 +522,35 @@ package body Config is
       -- Now, write the new file
       Write_and_Free(Cfg, root);
    end Disable;
+
+
+   function Read_Sections (Cfg : Configuration) return Section_List
+   is
+      use Ada.Text_IO;
+      use Ada.Strings.Fixed;
+
+      File          : File_Type;
+      Line          : String (1..1000);
+      Line_End      : Natural     := 0;
+      Sect_End      : Natural;
+
+      Section_Names : Section_List;
+   begin
+      Open(File, In_File, Cfg.Config_File.all);
+
+      Read_File:
+      while not End_Of_File(File) loop
+         Get_Line(File, Line, Line_End); -- error if line end > line'Last
+         if Line_End > 1 then
+            if Line(Line'First) = '[' then
+               --  Line'first = 1 as defined above
+               Sect_End := Index (Line(1 .. Line_End), "]") - 1;
+               String_Vector.Append (Section_Names, Line(2 .. Sect_End));
+            end if;
+         end if;
+      end loop Read_File;
+      Close(File);
+      return Section_Names;
+   end Read_Sections;
 
 end Config;

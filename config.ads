@@ -29,7 +29,9 @@
 
 -- Change log
 --
+-- 19-Aug-2017:   RE: Report offending line number in case of error
 -- 16-Jan-2017:  GdM: Variable terminator symbol can be different than '='
+-- 18-Dec-2016:   RE: Added Read_Sections
 -- 26-Oct-2011:  GdM/DB: Init also as a function
 -- 18-Mar-2010:  GdM: Float replaced by Long_Float
 -- 20-Jul-2009:  GdM: Added Replace_Section
@@ -41,6 +43,8 @@
 --
 
 -- Created On      : Fri Apr 26 08:09:14 1996
+
+with Ada.Containers.Indefinite_Vectors;
 
 package Config is
 
@@ -160,6 +164,12 @@ package Config is
    procedure Disable(Cfg      : Configuration;
                      Section  : String;
                      Mark     : String);
+
+   --  retrieve a list of all available sections in the ini file
+   package String_Vector is new Ada.Containers.Indefinite_Vectors
+     (Natural, String);
+   subtype Section_List is String_Vector.Vector;
+   function Read_Sections (Cfg : Configuration) return Section_List;
 
 private
 
