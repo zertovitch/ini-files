@@ -2,6 +2,7 @@ with Config; use Config;
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Command_Line;
+with Ada.Exceptions;
 
 procedure Test_Config is
 
@@ -46,12 +47,24 @@ procedure Test_Config is
 
   c: Configuration;
 
-  procedure Test_reading_ini(sec: String) is
+   procedure Test_reading_ini(sec: String) is
+      use Ada.Exceptions;
   begin
      Put_Line( "Read test in section: """ & sec & '"');
+
      Put_Line( " A string: {" & Value_Of(c, sec, "MyString") & '}');
-     Put_Line( " An integer: " & Integer'Image(Value_Of(c, sec, "ShowScheme")) );
-     Put_Line( " A floating-point value: " & Long_Float'Image(Value_Of(c, sec, "MyFloat")) );
+
+     begin
+        Put_Line( " An integer: " & Integer'Image(Value_Of(c, sec, "ShowScheme")) );
+     exception
+     when E : Data_Error => Put_Line (Exception_Information(E));
+     end;
+
+     begin
+        Put_Line( " A floating-point value: " & Long_Float'Image(Value_Of(c, sec, "MyFloat")) );
+     exception
+     when E : Data_Error => Put_Line (Exception_Information(E));
+     end;
   end Test_reading_ini;
 
 begin
