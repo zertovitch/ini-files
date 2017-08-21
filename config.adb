@@ -38,7 +38,6 @@ package body Config is
       return Cfg;
    end Init;
 
-
    function Is_Number_Start (c: Character) return Boolean is
    begin
       case c is
@@ -48,7 +47,6 @@ package body Config is
             return False;
       end case;
    end Is_Number_Start;
-
 
    -- Internal
    --
@@ -488,7 +486,6 @@ package body Config is
       end if;
    end Replace_Section;
 
-
    --  Disable the Mark using a semicolon prefix
    --
    procedure Disable(Cfg      : Configuration;
@@ -536,31 +533,27 @@ package body Config is
       Write_and_Free(Cfg, root);
    end Disable;
 
-
    function Read_Sections (Cfg : Configuration) return Section_List
    is
       use Ada.Text_IO;
       use Ada.Strings.Fixed;
 
       File          : File_Type;
-      Line          : String (1..1000);
-      Line_End      : Natural     := 0;
-      Sect_End      : Natural;
-
       Section_Names : Section_List;
    begin
       Open(File, In_File, Cfg.Config_File.all);
 
       Read_File:
       while not End_Of_File(File) loop
-         Get_Line(File, Line, Line_End); -- error if line end > line'Last
-         if Line_End > 1 then
-            if Line(Line'First) = '[' then
-               --  Line'first = 1 as defined above
-               Sect_End := Index (Line(1 .. Line_End), "]") - 1;
-               String_Vector.Append (Section_Names, Line(2 .. Sect_End));
+         declare
+            Line     : constant String := Get_Line(File);
+            Sect_End : Natural;
+         begin
+            if Line'Length > 1 and then Line(Line'First) = '[' then
+               Sect_End := Index (Line, "]") - 1;
+               String_Vector.Append (Section_Names, Line(Line'First+1 .. Sect_End));
             end if;
-         end if;
+         end;
       end loop Read_File;
       Close(File);
       return Section_Names;

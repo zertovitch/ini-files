@@ -67,15 +67,24 @@ procedure Test_Config is
      end;
   end Test_reading_ini;
 
+   procedure Test_read_sections is
+      cfg: Configuration:= Init(Config_name);
+      sl: Section_List := cfg.Read_Sections;
+   begin
+      Put_Line("Config file has following sections:");
+      for s of sl loop
+         Put_Line("  - " & s);
+      end loop;
+   end;
+
 begin
   Put_Line("Test for Ini file manager.");
   Put_Line("Project currently hosted at: " & web);
   Create_ini_file;
+  Test_read_sections;
   for a in reverse Type_Mismatch_Action loop
      New_Line;
      Put_Line("*********** Expected behaviour on bad input is: " & Type_Mismatch_Action'Image(a) & " *****");
-     --
-     -- In Ada 2005+, "Init(c, name, ..." can be written as "c.Init(name, ...)", and so on.
      --
      c:= Init(Config_name, Case_Sensitive => True, On_Type_Mismatch => a);
      --
