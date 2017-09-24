@@ -264,7 +264,7 @@ package body Config is
       declare
          Value_As_String : constant String := Line (Value_Start .. Value_End);
          Val  : Long_Float;
-         package LFIO is new Ada.Text_IO.Float_IO(Long_FLoat);
+         package LFIO is new Ada.Text_IO.Float_IO(Long_Float);
          Last : Positive;
       begin
          if Value_As_String'Length > 0 and then
