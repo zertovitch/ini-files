@@ -193,7 +193,7 @@ package body Config is
    begin
       case Cfg.On_Type_Mismatch is
          when Raise_Data_Error =>
-            raise Ada.Text_IO.Data_Error with Err_Msg;
+            raise Ada.Text_IO.Data_Error with "Config (.ini files): " & Err_Msg;
 
          when Print_Warning    =>
             Put_Line(Standard_Error, "Config: warning: " & Err_Msg);
@@ -374,7 +374,7 @@ package body Config is
    begin
       Get_Value(Cfg, Section, Mark, Line, Value_Start, Value_End, Found_Line);
       if Found_Line = 0 then
-         raise Location_Not_Found;
+         raise Location_Not_Found with "(Config / .ini file)";
       end if;
       Open(File, In_File, Cfg.Config_File.all);
       Read_File:
@@ -482,7 +482,7 @@ package body Config is
       -- Now, write the new file
       Write_and_Free(Cfg, root);
       if not Found_section then
-         raise Section_Not_Found;
+         raise Section_Not_Found with "(Config / .ini file)";
       end if;
    end Replace_Section;
 
@@ -506,7 +506,7 @@ package body Config is
    begin
       Get_Value(Cfg, Section, Mark, Line, Value_Start, Value_End, Found_Line);
       if Found_Line = 0 then
-         raise Location_Not_Found;
+         raise Location_Not_Found with "(Config / .ini file)";
       end if;
       Open(File, In_File, Cfg.Config_File.all);
       Read_File:
