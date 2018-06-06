@@ -36,7 +36,8 @@ Contents
   - config.ads           : package specification
   - config.adb           : package body
   - test_config.adb      : test/demo procedure
-  - ini_files.gpr        : project file for the GNAT compiler
+  - ini_files_gnat.gpr   : project file for the GNAT compiler
+  - ini_files_oa.prj     : project file for the ObjectAda compiler
   - ini_file_manager.txt : this file
 
 Warning & legal

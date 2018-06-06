@@ -5,6 +5,7 @@ with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
 with Ada.Characters.Handling;
 with Ada.Unchecked_Deallocation;
+with Ada.IO_Exceptions;
 
 package body Config is
 
@@ -175,9 +176,9 @@ package body Config is
    return String
    is
       Line              : String(1 .. Max_Line_Length);
-      Value_Start       : Natural;
-      Value_End         : Natural;
-      Found_Line        : Natural;
+      Value_Start       : Natural := Line'First;
+      Value_End         : Natural := Line'First - 1;
+      Found_Line        : Natural := 0;
    begin
       Get_Value(Cfg, Section, Mark, Line, Value_Start, Value_End, Found_Line);
       if Line(Value_Start .. Value_End) = "" then
@@ -210,9 +211,9 @@ package body Config is
    return Integer
    is
       Line              : String(1 .. Max_Line_Length);
-      Value_Start       : Natural;
-      Value_End         : Natural;
-      Found_Line        : Natural;
+      Value_Start       : Natural := Line'First;
+      Value_End         : Natural := Line'First - 1;
+      Found_Line        : Natural := 0;
    begin
       Get_Value(Cfg, Section, Mark, Line, Value_Start, Value_End, Found_Line);
 
@@ -234,13 +235,13 @@ package body Config is
          then
             return Integer'Value(Value_As_String);
          else
-            Type_Error(Cfg, Value_As_String, "an integer number in line"&Found_Line'Img);
+            Type_Error(Cfg, Value_As_String, "an integer number in line" & Integer'Image(Found_Line));
             return Default;
          end if;
       end;
    exception
-      when others =>
-         Type_Error(Cfg, Line (Value_Start..Value_End), "an integer number in line"&Found_Line'Img);
+      when Constraint_Error =>  --  raised by 'Value on faulty argument
+         Type_Error(Cfg, Line (Value_Start..Value_End), "an integer number in line" & Integer'Image(Found_Line));
          return Default;
    end Value_Of;
 
@@ -251,9 +252,9 @@ package body Config is
    return Long_Float
    is
       Line              : String(1 .. Max_Line_Length);
-      Value_Start       : Natural;
-      Value_End         : Natural;
-      Found_Line        : Natural;
+      Value_Start       : Natural := Line'First;
+      Value_End         : Natural := Line'First - 1;
+      Found_Line        : Natural := 0;
    begin
       Get_Value(Cfg, Section, Mark, Line, Value_Start, Value_End, Found_Line);
 
@@ -275,13 +276,14 @@ package body Config is
             LFIO.Get(Value_As_String, Val, Last);
             return Val;
          else
-            Type_Error(Cfg, Value_As_String, "a floating-point number in line"&Found_Line'Img);
+            Type_Error(Cfg, Value_As_String, "a floating-point number in line" & Integer'Image(Found_Line));
             return Default;
          end if;
       exception
-      when others =>
-         Type_Error(Cfg, Value_As_String, "a floating-point number in line"&Found_Line'Img);
-         return Default;
+         --  raised by 'Value or Get (respectively) on faulty argument:
+         when Constraint_Error | Ada.IO_Exceptions.Data_Error =>
+            Type_Error(Cfg, Value_As_String, "a floating-point number in line" & Integer'Image(Found_Line));
+            return Default;
       end;
    end Value_Of;
 
