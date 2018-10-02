@@ -418,7 +418,6 @@ package body Config is
       Line_Count        : Natural    := 0;
       use Ada.Text_IO;
       File              : File_Type;
-      use Ada.Strings.Fixed;
       --
       root, curr, new_ini_line: Ini_Line_Ptr:= null;
       --
@@ -502,7 +501,6 @@ package body Config is
       Line_Count        : Natural    := 0;
       use Ada.Text_IO;
       File              : File_Type;
-      use Ada.Strings.Fixed;
       --
       root, curr, new_ini_line: Ini_Line_Ptr:= null;
    begin
