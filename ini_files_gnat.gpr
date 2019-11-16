@@ -15,9 +15,15 @@ project Ini_files_GNAT is
 
    package Compiler is
       for Default_Switches ("ada") use (
-              "-gnatyaknpr",  --  Style: check all casings: a:attribute, k:keywords, n:package Standard identifiers, p:pragma, r:identifier references
-              "-gnatybfhiu",  --  Style: check b:no blanks at end of lines, f:no ff/vtabs, h: no htabs, i:if-then layout, u:no unnecessary blank lines
-              "-gnatyx"       --  Style: check x:no extra parens
+                "-gnatyaknpr",  --  Style: check all casings: a:attribute, k:keywords, n:package Standard identifiers, p:pragma, r:identifier references
+                "-gnatybfhiu",  --  Style: check b:no blanks at end of lines, f:no ff/vtabs, h: no htabs, i:if-then layout, u:no unnecessary blank lines
+                "-gnatyO",      --  Style: check that overriding subprograms are explicitly marked as such.
+                "-gnatyx",      --  Style: check x:no extra parens
+                "-gnatye",      --  Style: check e:end/exit labels present
+                "-gnatytc",     --  Style: check t:token separation rules, c:comment format (two spaces)
+                "-gnatwa",      --  Warnings: all standards info/warnings
+                "-gnatwh",      --  Warnings: turn on warnings for hiding declarations
+                "-gnatVa"       --  turn on all validity checking options
       );
    end Compiler;
 

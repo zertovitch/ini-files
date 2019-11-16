@@ -22,14 +22,14 @@ the .ini extension on your computer!
 The Config package is typically used as in
 the following demo procedure:
 
-  with Config; use Config;
-  with Ada.Text_IO; use Ada.Text_IO;
-  procedure Small_demo is
-    c: Configuration;
-  begin
-    Init(c, "config.ini");
-    Put_Line( Value_Of(c, "Section 2", "a_string"));
-  end;
+        with Config; use Config;
+        with Ada.Text_IO; use Ada.Text_IO;
+        procedure Small_demo is
+          c: Configuration;
+        begin
+          Init(c, "config.ini");
+          Put_Line( Value_Of(c, "Section 2", "a_string"));
+        end;
 
 Contents
 ========
@@ -46,19 +46,21 @@ There is NO WARRANTY in this software. Read copyright notice in config.ads.
   
 How to build and test the Ini file manager
 ==========================================
-Here is how to build with GNAT/GCC (for other compilers, it
-should be simple as well):
-      - type "gprbuild test_config" in the command line
+For building with GNAT/GCC:
+      - type "gprbuild -p -P ini_files_gnat.gpr" in the command line
   or
-      - use the project file, ini_files.gpr, from the
+      - use the project file, ini_files_gnat.gpr, from the
         GNAT Programming Studio (GPS); press F4
   or
       - open test_config.adb with AdaGIDE, press F3
   or
       - your way...
 
-For building with ObjectAda, create a project with the files
-config.ads, config.adb, test_config.adb; the rest should be obvious.
+For building with ObjectAda, you can use the ini_files_oa.prj project file.
+
+For other compilers, it should be simple as well: have
+config.ads, config.adb, test_config.adb at the same place
+and build test_config as the main program.
       
 As a result there is a test_config[.exe] executable.
 
