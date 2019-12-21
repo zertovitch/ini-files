@@ -48,8 +48,9 @@ with Ada.Containers.Indefinite_Vectors;
 
 package Config is
 
-   web : constant String := "http://sourceforge.net/projects/ini-files/";
-   --  ^-- hopefully the latest version is there
+   web     : constant String := "https://sourceforge.net/projects/ini-files/";
+   web_alt : constant String := "https://github.com/zertovitch/ini-files";
+   --  Hopefully the latest version is at one of those locations.
 
    type Configuration is tagged private;
 

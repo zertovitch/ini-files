@@ -28,7 +28,7 @@ the following demo procedure:
           c: Configuration;
         begin
           Init(c, "config.ini");
-          Put_Line( Value_Of(c, "Section 2", "a_string"));
+          Put_Line(Value_Of(c, "Section 2", "a_string"));
         end;
 
 Contents

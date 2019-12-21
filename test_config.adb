@@ -78,13 +78,18 @@ procedure Test_Config is
    end Test_read_sections;
 
 begin
-  Put_Line ("Test for Ini file manager.");
-  Put_Line ("Project currently hosted at: " & web);
+  Put_Line ("Test_Config - Test for Ini file manager.");
+  Put_Line ("              Project Ini-Files currently hosted");
+  Put_Line ("                 at: " & web);
+  Put_Line ("                and: " & web_alt);
   Create_ini_file;
   Test_read_sections;
   for a in reverse Type_Mismatch_Action loop
      New_Line;
-     Put_Line ("*********** Expected behaviour on bad input is: " & Type_Mismatch_Action'Image (a) & " *****");
+     Put_Line ("***********");
+     Put_Line ("***********  Expected behaviour on bad input is now: " & Type_Mismatch_Action'Image (a));
+     Put_Line ("***********");
+     New_Line;
      --
      c := Init (Config_name, Case_Sensitive => True, On_Type_Mismatch => a);
      --
