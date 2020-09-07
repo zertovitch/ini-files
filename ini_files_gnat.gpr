@@ -1,5 +1,5 @@
 --  Project file for GNAT/GCC or the GNAT Programming Studio (GPS)
---  Build me with "gprbuild -p -P ini_files_gnat", or open me with GPS
+--  Build me with "gprbuild -P ini_files_gnat", or open me with GPS
 --
 project Ini_files_GNAT is 
 
@@ -12,6 +12,7 @@ project Ini_files_GNAT is
    for Source_Dirs use (".");
    for Object_Dir use "obj";
    for Exec_Dir use ".";
+   for Create_Missing_Dirs use "True";  --  Flips by default the "-p" switch
 
    package Compiler is
       for Default_Switches ("ada") use (
