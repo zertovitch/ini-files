@@ -1,7 +1,7 @@
 Welcome to the Ini file manager
 ===============================
 
-The Ini file manager consists of a ingle ackage, Config, which
+The Ini file manager consists of a single package, Config, which
 can read and modify informations from various configuration
 files known as "ini" files. They are called "ini" files because
 they have often the ".ini" extension, but some also have
