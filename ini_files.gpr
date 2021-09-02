@@ -1,7 +1,7 @@
 --  Project file for GNAT/GCC or the GNAT Programming Studio (GPS)
---  Build me with "gprbuild -P ini_files_gnat", or open me with GPS
+--  Build me with "gprbuild -P ini_files", or open me with GPS
 --
-project Ini_files_GNAT is 
+project Ini_files is 
 
    for Main use (
       "test_config.adb", 
@@ -9,7 +9,7 @@ project Ini_files_GNAT is
       "rosetta_updt_cfg.adb",
       "rosetta_updt_cfg_reset.adb"
       );
-   for Source_Dirs use (".");
+   for Source_Dirs use (".", "tests");
    for Object_Dir use "obj";
    for Exec_Dir use ".";
    for Create_Missing_Dirs use "True";  --  Flips by default the "-p" switch
@@ -38,4 +38,4 @@ project Ini_files_GNAT is
       for Default_Switches ("adacontrol") use ("-f", "verif.aru");
    end Ide;
    
-end Ini_files_GNAT;
+end Ini_files;

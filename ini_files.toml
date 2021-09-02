@@ -1,0 +1,12 @@
+[general]
+description = "A standalone, portable Ada package for configuration files"
+licenses = ["MIT"]
+authors = ["Rolf Ebert", "Gautier de Montmollin"]
+website = "https://sourceforge.net/p/ini-files/"
+maintainers = ["rolf.ebert.gcc@gmx.de"]
+maintainers-logins = ["RREE"]
+project-files = ["ini_files.gpr"]
+
+['9.0']
+origin = "https://sourceforge.net/projects/ini-files/files/ini-files/ini-files-09.zip"
+origin-hashes = ["sha512:0e09df00032f969405de6a420b71bc395a1aa0fc37c4556b907a1f33c0ced2db220d78510aece40a1526ebf5d6d3f076c69619dd6c501d1b3e4c91f332b22e9c"]
