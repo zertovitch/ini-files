@@ -2,7 +2,7 @@
 --  Config - A simple package for parsing and modifying configuration files
 --           (also known as .ini, .inf, .cfg, ... files)
 --
---  Copyright (c) Rolf Ebert & Gautier de Montmollin 1996 .. 2019
+--  Copyright (c) Rolf Ebert & Gautier de Montmollin 1996 .. 2024
 --
 --  Permission is hereby granted, free of charge, to any person obtaining a copy
 --  of this software and associated documentation files (the "Software"), to deal
@@ -41,16 +41,16 @@
 --                     - A few fixes
 --  26-Apr-1996:   RE: Created
 --
-
 --  Created On      : Fri Apr 26 08:09:14 1996
 
 with Ada.Containers.Indefinite_Vectors;
 
 package Config is
 
-   web     : constant String := "https://sourceforge.net/projects/ini-files/";
-   web_alt : constant String := "https://github.com/zertovitch/ini-files";
-   --  Hopefully the latest version is at one of those locations.
+   web       : constant String := "https://sourceforge.net/projects/ini-files/";
+   web_alt   : constant String := "https://github.com/zertovitch/ini-files";
+   web_alire : constant String := "https://alire.ada.dev/crates/ini_files";
+   --  Hopefully the latest version can be acquired from one of those locations.
 
    type Configuration is tagged private;
 
@@ -78,16 +78,13 @@ package Config is
                    --  Some configuration files have the form "Var value" instead of
                    --  "Var=value". Of course, if Variable_Terminator = ' ', variable
                    --  names cannot have a space in them.
-                   Variable_Terminator :     Character := '='
-                   --
-                   );
+                   Variable_Terminator :     Character := '=');
 
    --  Same, as a function (can be used in a declaration part as a constructor)
    function Init (Config_File_Name    :  String;
                   Case_Sensitive      :  Boolean := True;
                   On_Type_Mismatch    :  Type_Mismatch_Action := Raise_Data_Error;
-                  Variable_Terminator :  Character := '='
-                  )
+                  Variable_Terminator :  Character := '=')
    return Configuration;
 
    --  Value_Of : getting values from a configuration file.
@@ -162,9 +159,9 @@ package Config is
 
    --  Disable the Mark using a semicolon prefix
    --
-   procedure Disable (Cfg      : Configuration;
-                      Section  : String;
-                      Mark     : String);
+   procedure Disable (Cfg     : Configuration;
+                      Section : String;
+                      Mark    : String);
 
    --  retrieve a list of all available sections in the ini file
    package String_Vector is new Ada.Containers.Indefinite_Vectors

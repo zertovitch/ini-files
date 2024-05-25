@@ -1,5 +1,11 @@
---  Project file for GNAT/GCC or the GNAT Programming Studio (GPS)
---  Build me with "gprbuild -P ini_files", or open me with GPS
+--  This is a GNAT, GCC or GNAT Studio project file
+--  for the Zip-Ada project:
+--
+--      Project page:  http://sf.net/projects/ini-files/
+--      Mirror:        https://github.com/zertovitch/ini-files
+--      Alire crate:   https://alire.ada.dev/crates/ini_files
+--
+--  Build me with "gprbuild -P ini_files", or open me with GNAT Studio.
 --
 project Ini_files is 
 
